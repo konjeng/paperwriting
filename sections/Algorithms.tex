@@ -1,0 +1,136 @@
+\section{Proposed System Architecture}\label{sec:algorithms}
+Figure 1 shows our faceted navigation system architechture for reviews. Our proposed solution system consist three modules: Candidate feature generation, feature ontology tree construction, mining feature review mappings. Input to the system are product reviews collected from various datasets. Each of these reviews are exists in unstructured text format. Hence, raw review inputs are first cleaned and tagged into linguistic parts(nouns, verb etc) using $brill$ $part$ $of$ $speech$ $tagger$\cite{brill1992simple}. Later in our first module, nouns are extracted and pruned out from tagged data to generate candidate features. Candidate features determines potential features of the product extracted from review corpus. These features are usually represented by noun terms in unstructured text and can be easily extracted from tagged data. In our third module, we heirarchize the candidate feature as a feature ontology tree. Nodes of these ontology tree represents features of the product. At last, we generate feature and review snippet mappings and store it to our database. Feature ontology is presented to user as a faceted navigation panel and user interatively narrows down the reviews and relevant snippet by exploring the facets. Each modules are explained in details as separate subsections.
+
+\begin{figure}[h!]
+\includegraphics[width = 80mm,height =60mm]{architecture.png}
+\caption{Faceted Navigation System Architechture for Reviews \label{overflow}}
+\end{figure}
+
+
+\subsection{Candidate Feature Set Generation}
+In order to construct feature ontology tree, candidate features are extracted from the review corpus. In our work to achieve these we used two different approaches: $association$ $rule$ $mining$\cite{hu2004mining} and $tf-idf$ $pruning$. These approaches helps in pruning out the irrelevant nouns and generates a set of candidate features. Association rule mining extract the frequent nouns patterns occurred in review corpus. These frequent nouns are again pruned out using compact pruning technique to generate features. This technique is only able to extract frequent features and left out the infrequent features which occurs very less in review corpus.
+
+$Tf$-$Idf$ statistically measures term importance over the set of documents. This term importance are measure by two units: $term$ $frequency$ and $inverse$ $document$ $frequency$. Term frequency determines how frequent a term is occuring in a document whereas IDF defines how rare a term is to set of documents. Candidate feature or noun can be easily extracted from review corpus by applying certain $tf-idf$ $threshold$. Advantage of applying $tf-idf$ $pruning$ is it includes the infrequent feature in the candidate feature set. By these two approaches, we will create two sets of candidate features and apply other modules separetely on both sets. Later we will evaluate the final results in evalution section.     
+
+\subsection{Feature Ontology Tree Construction}
+Feature ontology gives information about how features are correlated with each other. We can resolve feature information overload problem using this feature ontology tree by presenting top level features at a time. User can explore the other subfeatures by their relavant top level features. Root of the ontology tree is the domain name of the product. The domain can be easily extracted from the candidate features by extracting the most frequent feature from the candidate features. Nodes in the tree are the features of the product and an edge between features $f_{1} \rightarrow f_{2}$ determines $parent$ $to$ $child$ relationship.
+
+To build feature ontology tree we leveraged $ConceptNet$ database to extract semantic relationship between feature to other feature. 
+ConceptNet provides various many semantic relationship. Out of which, we selected 12 relations to built our ontology tree. Also ConceptNet has one to many relationship between various domains. Hence there is big chance of $topic$ $drift$ while expanding ontology tree. For example, ``$Camera$ is relatedTo $lens$'', ``$lens$ is madeOf $glass$'', ``$glass$ is relatedTo $window$''. Here $camera$ and $window$ are related as per conceptNet but $window$ doesn't belong to camera domain. Hence to control $topic$ $drift$, authors in \cite{mukherjee2013sentiment} proposed categorization of the relations into three classes: $Heirarchical$ $relations$, $Synonym$ $relations$, $Functional$ $relations$ and also proposed evaluation order $H$>$S$>$F$.   
+
+\begin{table}[h!]
+\begin{center}
+	\begin{tabular}{ |c|c|c| } 
+		\hline
+		Relation Class & Relations & Priority \\
+		\hline
+		Heirarchical Relations & HasA, PartOf, &\\
+								& MadeOf, LocatedNear & 1 \\ 
+		\hline
+		Synonym Relations & Synonym = DefinedAs &\\
+					   	& > DerivedFrom > IsA & \\
+					   	& > RelatedTo & 2\\ 
+		\hline
+		Functional Relations & UsedFor, CapableOf, &\\
+							& HasProperty & 3 \\ 
+		\hline
+	\end{tabular}
+	\caption {Semantic Relations, their Relation Class and Priority Order(``>'' and ``='' shows inner class priority order )}
+\end{center}
+\end{table}
+
+Algorithm proposed in work\cite{mukherjee2013sentiment} missed out one information: how will we decide that a $feature_{new}$ will be a $parent$ or a $child$ of the $feature_{old}$. For example, in accordance to algorithm mentioned in \cite{mukherjee2013sentiment} , ``$lens$ is partOf $camera$'' will result in undirected edge ($lens$,$camera$) in ontology tree. Hence due to undirected edge it is unclear that which one of them is a $parent$ or a $child$. Correct $parent$-$child$ relationship is the necessity of our model. To resolve this, we proposed the concept of $edge$ $type$ in our model.
+
+For our purpose, $edge$ $type$ will provide the information of the new feature $f$ as being a $parent$ or a $child$. $Edge$ $type$ is decided based on semantic relationship. We classified relations into three edge types: $Top$ $to$ $bottom$ $relation$(TBR), $Bottom$ $to$ $up$ $relation$(BUR) and $Bidirectional$ $relations$ (BDR). Relations belongs to these edge types is described in table 2.
+
+\begin{table}[h!]
+\begin{center}
+	\begin{tabular}{ |c|c| } 
+		\hline
+		Edge Type & Relations \\
+		\hline
+		Top to Bottom Relation(TBR) & HasA, LocatedNear, \\
+									& MadeOf, UsedFor, \\
+									& CapableOf, HasProperty \\
+		\hline
+		Bottom Up Relation(BUR) & PartOf, DerivedFrom  \\
+		\hline
+		Bidirectional relations(BDR) & Synonym, DefinedAs, \\
+									 & RelatedTo, IsA \\
+		\hline
+	\end{tabular}
+\end{center}
+\caption {Edge types and Relations List}
+\end{table}
+
+$TBR$ relations shows $parent$ to $child$ relationship whereas $BUR$ exhibits the property of $child$ to $parent$ relationship. $BDR$ relations are special case where it exhibits both the property of $TBR$ relations and $BUR$ relations. Depending on the these edge types $parent$ and $child$ are decided. For example:
+
+``lens is partOf Camera''
+
+``Camera is capableOf taking pictures''
+
+``zoom is related to lens''
+
+In the first example, lens and camera has bottom up relationship hence edge ( lens $\leftarrow$ camera ) is added to ontology tree. Similarly for next two example edge ( camera $\rightarrow$ picture ) and ( zoom $\leftrightarrow$ lens ) is added to ontology tree as they have top to bottom and bidirectional relationship respectively. For bidirectional edges, we have two possiblity to add edge(e.g. $f_{1}$ $\leftrightarrow $ $f_{2}$: $f_{1}$ $\leftarrow$ $f_{2}$ or $f_{1}$ $\rightarrow$ $f_{2}$). Any of them can become subfeature of other feature. Hence to maintain tree coherency, i.e. edges only direct from top to bottom, we will make feature $f_{1}$ as subfeature iff feature $f_{2}$ is present in tree $G$ and vice versa. 
+
+In addition to edge types, we have used BFS exploration for our ontology expansion. We extract relevant concepts from conceptnet by providing the $product$ $domain$ initially and connect the features edges based on edge type in BFS manner. We repeat the process of each $subfeature$ until tree expanded upto predefined threshold height $h$. Benefits of BFS exploration is that it provides shortest distance to relevant concepts from product domain in minimum depth expansion. In case of many to many relation edge conflict $H$>$S$>$F$ order evaluation is followed. Also, to cluster the all the relevant synonyms at single respective feature, we defined inner priority order within synonym relation class as mentioned in table 1. In conflicting case, edge in ontology tree is added for higher priority relation and deleting the lower priority relation edge. Finally we will merge all the synonyms to remove the redundant information from the tree.
+
+
+\begin{algorithm}
+	\SetKwInOut{Input}{Input}
+	\SetKwInOut{Output}{Output}
+	
+	\Input{Candidate Feature Set $D =\{\langle N,f \rangle \}$ where \\ $ N$=candidate feature set,\\ $f$=frequency count of each candidate feature   \\ Relation List $H,S,F $ } 
+	\Output{Feature Ontology Tree $G$ }
+	Graph $G=(V,E)$  where $V$=Vertex Set and $E$=Edge Set \\
+	Initialize $V$=${ \phi }$ and $E$=${ \phi }$ ,Initialize Queue=$Q$ \\
+	domain $d_{1}=$max frequency candidate feature \\
+	$Q.enqueue(d_{1})$ \\
+	visited$[d_{1}]$=$true$ \\
+	
+	\For{each relation set R in \{H,S,F\}}{
+		\While{Q is not empty}{
+			
+			Concept $c= Q.dequeue()$ \\
+			$V_{1}$ = Extract all nodes connected to concept $c$ in concept-net $iff\ r_{new} \in R$ \\		
+			\If{ $v_{i} \in V_{1}$ and $v_{i} \in N$ and $v_{i} \notin$ visited}{
+				
+				\If{$v_{i} \notin G$}{
+					Add vertex $v_{i}$ to $V$\\
+					
+					\If{$r_{new} \in$  TBR or $r_{new} \in$ BDR}{
+						Add edge $(c,v_{i})$ to $E$ 
+					}
+					\Else{
+						Add edge $(v_{i},c)$ to $E$	
+					}
+				}
+				\Else{
+					Get parent $p$ and old relation $r_{old}$ between parent $p$ and concept $c$
+					
+					\If{$priority_{r_{new}}>priority_{r_{old}}$}{
+						Update parent of $v_{i}$ to new parent $c$  
+					}
+				}
+				$Q.enqueue(v_{i})$ \\
+				visited$[v_{i}]$=$true$ \\
+				
+			}
+			
+		}
+		
+	}
+	Merge the nodes in $G\ iff\ relation \in$ \{Synonym, DefinedAs\}\\  
+	\caption{Construction of feature ontology tree$[9]$}
+\end{algorithm}
+
+
+\subsection{Mining Feature review mapping}
+After creating feature ontology tree, we mine all the < $feature$, $review$ $snippet$ > mapping as a transaction file. Each transaction file represent a mapping between a single feature to corresponding reviews and it is created for each features individually. In our model, we stored these files into the nosql database $($ e.g. couchdb, mongodb $)$. These transaction files are later queried for exploring the reviews iteratively based on consumer interaction on the interface. Structure of each transaction file and reviews are mentioned as follows:
+
+\textbf{Transaction File:}\\
+$\{$  id$:$ $<$Feature ID$>$, Feature$:$ $<$Feature Name$>$ , review$:$ $<$List of reviews $>$ $\}$
+
+\textbf{Review:}\\
+$\{$ revId: $<$Review Id$>$, lineId: $<$LineNumber$>$ , Value: $<$Corresponding Review Line$>$ $\}$
+

@@ -1,5 +1,156 @@
-\documentclass{article}
+\documentclass{sig-alternate-05-2015}
+\usepackage[]{acmcopyright}
 \usepackage[utf8]{inputenc}
+\graphicspath{{images/}}  % Location of the graphics files (set up for graphics to be in PDF format)
+
+% Include any extra LaTeX packages required
+\usepackage[square, numbers, comma, sort&compress]{natbib}  % Use the "Natbib" style for the references in the Bibliography
+\usepackage{verbatim}  % Needed for the "comment" environment to make LaTeX comments
+\usepackage{vector}  % Allows "\bvec{}" and "\buvec{}" for "blackboard" style bold vectors in maths
+%%\hypersetup{urlcolor=black, colorlinks=true}  % Colours hyperlinks in blue, but this can be distracting if there are many links.
+\usepackage{algorithmic}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\usepackage{makecell}
+%\usepackage{url}
+\usepackage{graphicx}
+\usepackage{balance}
+\usepackage{amsmath}
+\usepackage{algorithmic}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{subfigure}
+\usepackage{graphicx}
+\usepackage{balance}
+\usepackage{color}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{soul}
+\usepackage{color}
+\usepackage{lipsum}
+\graphicspath{ {images/} }
+
+
+\newcommand*{\myfont}{\fontfamily{fvs}\selectfont}
+\newcommand{\eat}[1]{}
+\newcommand{\lb}{$[$}
+\newcommand{\eg}{{\em e.g.}}
+\newcommand{\etc}{{\em etc}}
+\newcommand{\ie}{{\em i.e.}}
+\newcommand{\rb}{$]$}
+
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{problem}{Problem}
+\newtheorem{theorem}{Theorem}[section]
+
+%% ----------------------------------------------------------------
 \begin{document}
-(Type your content here.)
+%%\frontmatter      % Begin Roman style (i, ii, iii, iv...) page numbering
+
+% Set up the Title Page
+\title{Aspect Based Review Exploration}
+\author{A1,A2,A3}
+
+\date{\today}
+
+\maketitle
+	\begin{abstract} 
+		\input{sections/abstract.tex}
+	\end{abstract}
+%% ----------------------------------------------------------------
+
+%% ----------------------------------------------------------------
+
+
+%% ----------------------------------------------------------------
+
+
+%% ----------------------------------------------------------------
+
+
+%% ----------------------------------------------------------------
+
+%% ----------------------------------------------------------------
+% End of the pre-able, contents and lists of things
+% Begin the Dedication page
+
+
+	%\category{D.2.2} {Information Interfaces and Presentation}{User Interf1aces}
+	%\terms{Algorithms, Design, Performance} \keywords{Query Interfaces, Result Summarization}
+	
+	%	\input{sections/Examples.tex}
+	\input{sections/Introduction.tex}
+	\input{sections/ProblemDefinition.tex}
+	\input{sections/RelatedWork.tex}
+	\input{sections/Algorithms.tex}
+	\input{sections/Evaluation.tex}
+	\input{sections/Conclusion.tex}
+    
+%\section{Introduction}
+
+\balance
+	%\begin{small}
+	\bibliographystyle{abbrv} 
+	\bibliography{bib_Neelesh}
+	\balancecolumns
+	%\end{small}
+
+% ag,jasgj \\
+% cgasdjgas\\
+
+
+
+% \section{Related Work}
+% pokipoi,oiu9 u ihjnin in ijniikin \\
+
+% ijn ijn ijn ijn jbghb \\
+% uhb nijnn uninini \\ ninininijnhubu bboijnijn ijn ij\\ 
+
+% huinijnoihio ihok \\
+
+% \section{Problem Definition}
+% ghasdhj\\
+% sdhsj,m\\
+% dsagjhacs\\
+% sxcbjhmzc\\
+% xczaBHna\\
+% ghjsdcgj\\gdhjs\\ dsjhscahjk
+% dshjkas\\
+% pokpok\\iihihi
+% ghjjsd\\
+% cbhuidhsk\\
+% vbjhdshbm\\
+% dvshhsdk\\
+% dskjsdh,\\cskjsd\\
+% dshjsd\\
+
+
+% \section{Methodology}
+% sdchjhcmzs
+% xcajhga
+% xszacjhsa
+
+% \subsection{Algorithms}
+% a=b+c
+% chjsa
+% cahsjgasc
+% acgjhas
+% caxvc
+
+% \section{Experimental Evaluation}
+% cdgjhasdgjhsda
+% 100\% accuracy
+% jcdisoscj
+% csbkjsc
+% schjksh
+
+% \section{Conclusion and Future Work}
+% djhj
+% cskj,sd
+% cskjsd,
+
+
 \end{document}

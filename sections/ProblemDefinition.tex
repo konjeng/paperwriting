@@ -1,0 +1,62 @@
+\section{Problem Definition}\label{sec:problem-definition}
+Users often write product reviews in terms of various aspects (or features) 
+of the product. For example, for a mobile product, reviews are centered towards 
+processors, RAM, storage etc. These aspects of products are generally called 
+{\em product features}. Reviews help users in decision making process by 
+describing the quality of features. 
+
+Users have varying preferences. Usually all the features about a product 
+is not important to a user. Due to certain priority of each feature, user 
+reads a lot of review to look for relevant content. As the reviews are 
+unstructured text and exists in large volume, this task becomes very tiresome 
+for any user. To deal with the abundance of review, e-commerce websites 
+(Flipkart, Amazon etc.) provide ranking of reviews based on user likes.  
+Ranked reviews has its own limitation. First limitation is that going 
+through top reviews might not give sufficient information to user about 
+relevant features of product. Other limitation is top reviews also exist 
+in abundance in number. Our first goal is address this issue and provide 
+an efficient system to extract the relevant reviews using features.
+
+Our other goal is to deal with feature information overload. In past, Many researcher have provided different features extraction techniques[] from the unstructured text. The number of features extracted from these methods depends on various parameters and it could result in hundreds of features. Hence exposing all features at once will create overload of information to user. In the end we will discuss about how we will apply existing system model to our work.
+
+
+\begin{problem}
+	Finding Relevant Reviews through features: Review Exploration
+\end{problem}
+Assume review set $ R $ have thousands of reviews for certain product. Each review $R_{i}$ consists set of review snippets $S = \{ r_{1}, r_{2}, r_{3},... \}$ having various features $f$ from feature set $F = \{f_{1}, f_{2}, f_{3},... \}$ . Our goal is to create $<feature,review\ snippet>$ mappings for each feature i.e. $<f_{x},r_{y}>$ which will help in order to extract the relevant review snippet $r_{y}$ by selecting interested feature $f_{x}$ by user . 
+
+This process can be easily demonstrated as follow: For a mobile product here are the two reviews:
+
+``Touch screen of the mobile is great, but the battery life is very short.''
+
+``This phone's battery is not good. I have to charge the phone twice a day.''
+
+Our system will generate $<feature, review\ snippet>$ mappings as:
+
+$<$touch screen, [ ``Touch screen of the mobile is great'' ]$>$
+
+$<$battery, [ ``but the battery life is very short'', ``This phone's battery is not good.'' ]$>$
+
+By choosing this feature the relevant feature ``touch screen'' extracted relevant review will be:
+
+``Touch screen of the mobile is great''
+
+
+\begin{problem}
+	How to efficiently control feature exposure to user: Feature ontology Tree construction 
+\end{problem}
+Information overload[] is an common issue that user face with most of the information retrieval system. In our system, user is presented with set of features $F = \{f_{1},f_{2},f_{3},...\}$ extracted from previous step. Feature extraction[] could result in hundreds of features which might lead to information overload when features set $F$ is exposed to user.    
+
+To efficiently control features exposure at any instance, a $feature\ ontology\ tree$[] is constructed. Feature ontology tree $T=(V,E)$ is a feature relationship hierarchy where each node $v_{i}$ represents a $feature$ of product and directed edge $e_{i}=(v_{i},v_{j})$ represents $parent-child\ relationship$ or $feature-subfeature\ relationship$. Root of the tree is the ``$domain$'' of the product.
+
+Feature ontology tree leverages feature-feature relationship to fold down multiple features into single feature as a child. Example of this feature-feature realtionship can be viewed as:
+
+``focus is part of lens''
+
+From above example, we can deduce that focus and lens are related as child and parent. Many user are unaware of these relationship between features and organising in hierarchy improves the product understanding. Other advantage of organising features in hierarchy is that it can be used for controlling the feature overflow information while exposing features to user. Construction of this feature ontology tree was published in Mukhargee's work[]. Our algorithm is variation of their work which we will discuss in algorithm section.
+
+\begin{problem}
+	Feature Based Faceted Navigation
+\end{problem}
+
+In our final system, feature ontology tree provides an faceted navigation panel in which user can easily browse through reviews for relevant information by choosing the features iteratively. Extracted reviews chunks are either relevant to the feature selected or relevant to their child. For example, for a camera product, choosing lens will give reviews about lens and its child focus, picture etc. At beginning domain of product and all the reviews are exposed to user. User can filter down the review chunks iteratively based on interested features until he is satisfied with result.   
